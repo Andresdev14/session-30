@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acudientes | School Admin</title>
+    <link rel="stylesheet" href="/src/shared/css/table.css" />
+    <link rel="stylesheet" href="/src/shared/css/form.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Acudientes</p>
+          <h1>Listado y registro</h1>
+          <p class="subtitle">Administra los datos de los acudientes registrados.</p>
+        </div>
+        <div class="page-actions">
+          <a class="button secondary-button" href="../dashboard/dashboard.html">Dashboard</a>
+          <a class="button secondary-button" href="../students/students.html">Estudiantes</a>
+          <a class="button secondary-button" href="../payments/payments.html">Pagos</a>
+        </div>
+      </header>
+
+      <section class="table-card">
+        <h2>Lista de acudientes</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Dirección</th>
+              </tr>
+            </thead>
+            <tbody id="guardiansBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="form-card">
+        <h2>Registrar acudiente</h2>
+        <div id="guardianMessage" class="message" hidden></div>
+        <form id="guardianForm" class="form-grid">
+          <label class="form-label">
+            Nombre
+            <input id="guardianFirstName" type="text" required />
+          </label>
+          <label class="form-label">
+            Apellido
+            <input id="guardianLastName" type="text" required />
+          </label>
+          <label class="form-label">
+            Teléfono
+            <input id="guardianPhone" type="text" required />
+          </label>
+          <label class="form-label">
+            Correo
+            <input id="guardianEmail" type="email" />
+          </label>
+          <label class="form-label">
+            Dirección
+            <input id="guardianAddress" type="text" />
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="button primary-button">Guardar acudiente</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/src/shared/js/guardians.js"></script>
+  </body>
+</html>

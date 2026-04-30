@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingreso | School Admin</title>
+    <link rel="stylesheet" href="/src/shared/css/login.css" />
+  </head>
+  <body>
+    <main class="login-page">
+      <section class="login-card">
+        <div class="login-brand">
+          <div class="brand-mark">SA</div>
+          <div>
+            <p class="brand-name">School Admin</p>
+            <p class="brand-caption">Panel de gestión escolar</p>
+          </div>
+        </div>
+
+        <div class="login-header">
+          <h1>Iniciar sesión</h1>
+          <p>Accede al panel administrativo de la escuela.</p>
+        </div>
+
+        <div id="message" class="message" hidden></div>
+
+        <form id="loginForm" class="login-form">
+          <label class="form-label">
+            Correo electrónico
+            <input id="email" type="email" placeholder="usuario@escuela.com" required />
+          </label>
+
+          <label class="form-label">
+            Contraseña
+            <input id="password" type="password" placeholder="Contraseña" required />
+          </label>
+
+          <button type="submit" class="button primary-button">Entrar</button>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/src/shared/js/login.js"></script>
+  </body>
+</html>

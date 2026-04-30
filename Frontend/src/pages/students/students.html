@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudiantes | School Admin</title>
+    <link rel="stylesheet" href="/src/shared/css/table.css" />
+    <link rel="stylesheet" href="/src/shared/css/form.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Estudiantes</p>
+          <h1>Registro y listado</h1>
+          <p class="subtitle">Administra los alumnos registrados en la institución.</p>
+        </div>
+        <div class="page-actions">
+          <a class="button secondary-button" href="../dashboard/dashboard.html">Dashboard</a>
+          <a class="button secondary-button" href="../guardians/guardians.html">Acudientes</a>
+          <a class="button secondary-button" href="../payments/payments.html">Pagos</a>
+        </div>
+      </header>
+
+      <section class="table-card">
+        <h2>Lista de estudiantes</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Documento</th>
+                <th>Grado</th>
+                <th>Año</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="studentsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="form-card">
+        <h2>Registrar estudiante</h2>
+        <div id="studentMessage" class="message" hidden></div>
+        <form id="studentForm" class="form-grid">
+          <label class="form-label">
+            Código
+            <input id="studentCode" type="text" required />
+          </label>
+          <label class="form-label">
+            Nombre
+            <input id="studentFirstName" type="text" required />
+          </label>
+          <label class="form-label">
+            Apellido
+            <input id="studentLastName" type="text" required />
+          </label>
+          <label class="form-label">
+            Tipo de documento
+            <input id="studentDocumentType" type="text" />
+          </label>
+          <label class="form-label">
+            Número de documento
+            <input id="studentDocumentNumber" type="text" />
+          </label>
+          <label class="form-label">
+            Fecha de nacimiento
+            <input id="studentBirthDate" type="date" />
+          </label>
+          <label class="form-label">
+            Grado
+            <input id="studentGrade" type="text" />
+          </label>
+          <label class="form-label">
+            Año escolar
+            <input id="studentSchoolYear" type="number" min="2000" />
+          </label>
+          <label class="form-label">
+            Estado
+            <select id="studentStatus">
+              <option value="active">Activo</option>
+              <option value="inactive">Inactivo</option>
+            </select>
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="button primary-button">Guardar estudiante</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/src/shared/js/students.js"></script>
+  </body>
+</html>
