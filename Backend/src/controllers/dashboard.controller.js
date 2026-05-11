@@ -4,9 +4,9 @@ import * as dashboardModel from "../models/dashboard.model.js";
 export const getDashboardStats = async (req, res) => {
   try {
     const data = await dashboardModel.getStats();
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -17,11 +17,14 @@ export const getDashboard = async (req, res) => {
     const activity = await dashboardModel.getRecentActivity(5);
 
     res.json({
-      stats,
-      recentActivity: activity
+      ok: true,
+      data: {
+        stats,
+        recentActivity: activity
+      }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -30,8 +33,8 @@ export const getRecentActivity = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
     const data = await dashboardModel.getRecentActivity(limit);
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };

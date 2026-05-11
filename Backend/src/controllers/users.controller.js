@@ -5,9 +5,9 @@ import bcrypt from "bcrypt";
 export const getUsers = async (req, res) => {
   try {
     const data = await userModel.getAll();
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -17,30 +17,44 @@ export const getUserById = async (req, res) => {
     const data = await userModel.getById(req.params.id);
 
     if (!data) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ ok: false, error: "User not found" });
     }
 
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
 // 🔹 CREATE USER
 export const createUser = async (req, res) => {
   try {
-    const body = req.body;
+    const { email, password, first_name, last_name, phone, role } = req.body;
 
-    if (!body.email || !body.password || !body.first_name || !body.last_name) {
-      return res.status(400).json({ error: "Missing required fields" });
+    // Validate required fields
+    if (!email || !password || !first_name || !last_name) {
+      return res.status(400).json({
+        ok: false,
+        error: "Missing required fields: email, password, first_name, last_name"
+      });
     }
 
-    body.password_hash = await bcrypt.hash(body.password, 10);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid email format"
+      });
+    }
+
+    const body = req.body;
+    body.password_hash = await bcrypt.hash(password, 10);
 
     const result = await userModel.create(body);
-    res.status(201).json(result);
+    res.status(201).json({ ok: true, data: result, message: "User created successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -52,17 +66,18 @@ export const updateUser = async (req, res) => {
 
     if (body.password) {
       body.password_hash = await bcrypt.hash(body.password, 10);
+      delete body.password;
     }
 
     const updated = await userModel.update(id, body);
 
     if (!updated) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ ok: false, error: "User not found" });
     }
 
-    res.json(updated);
+    res.json({ ok: true, data: updated });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -73,11 +88,11 @@ export const deleteUser = async (req, res) => {
     const deleted = await userModel.remove(id);
 
     if (!deleted) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ ok: false, error: "User not found" });
     }
 
-    res.json({ message: "User deleted" });
+    res.json({ ok: true, message: "User deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };

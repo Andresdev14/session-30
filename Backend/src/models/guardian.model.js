@@ -23,12 +23,12 @@ export const create = async (data) => {
     phone,
     email,
     address,
-    relationship
+    whatsapp_active
   } = data;
 
   const [result] = await pool.query(
     `INSERT INTO guardians
-    (id, first_name, last_name, phone, email, address, relationship)
+    (id, first_name, last_name, phone, email, address, whatsapp_active)
     VALUES (UUID(), ?, ?, ?, ?, ?, ?)`,
     [
       first_name,
@@ -36,7 +36,7 @@ export const create = async (data) => {
       phone || null,
       email || null,
       address || null,
-      relationship || null
+      whatsapp_active ?? 0
     ]
   );
 
@@ -51,7 +51,7 @@ export const update = async (id, data) => {
     phone,
     email,
     address,
-    relationship
+    whatsapp_active
   } = data;
 
   const [result] = await pool.query(
@@ -61,7 +61,7 @@ export const update = async (id, data) => {
       phone = COALESCE(?, phone),
       email = COALESCE(?, email),
       address = COALESCE(?, address),
-      relationship = COALESCE(?, relationship)
+      whatsapp_active = COALESCE(?, whatsapp_active)
     WHERE id = ?`,
     [
       first_name || null,
@@ -69,7 +69,7 @@ export const update = async (id, data) => {
       phone || null,
       email || null,
       address || null,
-      relationship || null,
+      whatsapp_active ?? null,
       id
     ]
   );

@@ -4,9 +4,9 @@ import * as accountsModel from "../models/accounts.model.js";
 export const getAccounts = async (req, res) => {
   try {
     const data = await accountsModel.getAll();
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -16,12 +16,12 @@ export const getAccountById = async (req, res) => {
     const data = await accountsModel.getById(req.params.id);
 
     if (!data) {
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ ok: false, error: "Account not found" });
     }
 
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -29,19 +29,36 @@ export const getAccountById = async (req, res) => {
 export const getAccountsByStudent = async (req, res) => {
   try {
     const data = await accountsModel.getByStudent(req.params.studentId);
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
 // 🔹 CREATE ACCOUNT
 export const createAccount = async (req, res) => {
   try {
+    const { student_id, charge_type_id, period, due_date, amount } = req.body;
+
+    // Validate required fields
+    if (!student_id || !charge_type_id || !period || !due_date || !amount) {
+      return res.status(400).json({
+        ok: false,
+        error: "Missing required fields: student_id, charge_type_id, period, due_date, amount"
+      });
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({
+        ok: false,
+        error: "Amount must be a positive number"
+      });
+    }
+
     const result = await accountsModel.create(req.body);
-    res.status(201).json(result);
+    res.status(201).json({ ok: true, data: result });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -52,12 +69,12 @@ export const updateAccount = async (req, res) => {
     const updated = await accountsModel.update(id, req.body);
 
     if (!updated) {
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ ok: false, error: "Account not found" });
     }
 
-    res.json(updated);
+    res.json({ ok: true, data: updated });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -68,11 +85,11 @@ export const deleteAccount = async (req, res) => {
     const deleted = await accountsModel.remove(id);
 
     if (!deleted) {
-      return res.status(404).json({ error: "Account not found" });
+      return res.status(404).json({ ok: false, error: "Account not found" });
     }
 
-    res.json({ message: "Account deleted" });
+    res.json({ ok: true, message: "Account deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };

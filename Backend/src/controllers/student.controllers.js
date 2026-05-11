@@ -4,9 +4,9 @@ import * as studentModel from "../models/student.model.js";
 export const getStudents = async (req, res) => {
   try {
     const data = await studentModel.getAll();
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -16,22 +16,32 @@ export const getStudentById = async (req, res) => {
     const data = await studentModel.getById(req.params.id);
 
     if (!data) {
-      return res.status(404).json({ error: "Not found" });
+      return res.status(404).json({ ok: false, error: "Student not found" });
     }
 
-    res.json(data);
+    res.json({ ok: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
 // POST
 export const createStudent = async (req, res) => {
   try {
+    const { student_code, first_name, last_name } = req.body;
+
+    // Validate required fields
+    if (!student_code || !first_name || !last_name) {
+      return res.status(400).json({
+        ok: false,
+        error: "Missing required fields: student_code, first_name, last_name"
+      });
+    }
+
     const result = await studentModel.create(req.body);
-    res.status(201).json(result);
+    res.status(201).json({ ok: true, data: result });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -42,12 +52,12 @@ export const updateStudent = async (req, res) => {
     const updated = await studentModel.update(id, req.body);
 
     if (!updated) {
-      return res.status(404).json({ error: "Student not found" });
+      return res.status(404).json({ ok: false, error: "Student not found" });
     }
 
-    res.json(updated);
+    res.json({ ok: true, data: updated });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -58,11 +68,11 @@ export const deleteStudent = async (req, res) => {
     const deleted = await studentModel.remove(id);
 
     if (!deleted) {
-      return res.status(404).json({ error: "Student not found" });
+      return res.status(404).json({ ok: false, error: "Student not found" });
     }
 
-    res.json({ message: "Student deleted" });
+    res.json({ ok: true, message: "Student deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ ok: false, error: error.message });
   }
 };

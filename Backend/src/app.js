@@ -11,6 +11,7 @@ import pagosRoutes from "./routes/pagos.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import usuariosRoutes from "./routes/usuarios.routes.js";
 import authMiddleware from "./middlewares/auth.middleware.js";
+import whatsappRoutes from "./modules/whatsapp/whatsapp.routes.js";
 
 const app = express();
 app.use(cors());
@@ -27,6 +28,7 @@ app.use("/charge-types", authMiddleware, chargeTypesRoutes);
 app.use("/accounts", authMiddleware, accountsRoutes);
 app.use("/pagos", authMiddleware, pagosRoutes);
 app.use("/dashboard", authMiddleware, dashboardRoutes);
+app.use("/whatsapp", whatsappRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
