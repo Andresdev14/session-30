@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WhatsApp | School Admin</title>
+    <link rel="stylesheet" href="/src/pages/whatsapp/whatsapp.css" />
+  </head>
+  <body>
+    <main class="page-shell whatsapp-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">WhatsApp</p>
+          <h1>Enviar mensaje</h1>
+          <p class="subtitle">Envía mensajes rápidos a través del servicio WhatsApp integrado.</p>
+        </div>
+        <div class="page-actions">
+          <a class="button secondary-button" href="../dashboard/dashboard.html">Dashboard</a>
+          <a class="button secondary-button" href="../students/students.html">Estudiantes</a>
+          <a class="button secondary-button" href="../guardians/guardians.html">Acudientes</a>
+          <a class="button secondary-button" href="../payments/payments.html">Pagos</a>
+        </div>
+      </header>
+
+      <div id="toastContainer" class="toast-container"></div>
+
+      <section class="form-card whatsapp-card">
+        <div class="section-head">
+          <div>
+            <h2>Enviar WhatsApp</h2>
+            <p class="section-copy">Usa este formulario para enviar un mensaje directo al número del tutor o encargado.</p>
+          </div>
+          <span class="badge success">Integración activa</span>
+        </div>
+
+        <div class="info-panel">
+          <p class="status-copy">Escribe el número en formato internacional y personaliza tu mensaje antes de enviarlo.</p>
+        </div>
+
+        <div id="whatsappMessage" class="message success" hidden></div>
+
+        <form id="whatsappForm" class="form-grid">
+          <label class="form-label">
+            Teléfono destino
+            <input id="whatsappPhone" type="tel" placeholder="573001112233" required autocomplete="off" />
+          </label>
+          <label class="form-label full-width">
+            Mensaje
+            <textarea id="whatsappText" rows="6" placeholder="Escribe aquí tu mensaje..." required></textarea>
+          </label>
+          <p class="hint-text">Formato internacional sin + ni espacios. Ej: 573001112233</p>
+          <div class="form-actions full-width">
+            <button type="submit" class="button primary-button" id="submitButton">Enviar mensaje</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/src/pages/whatsapp/whatsapp.js"></script>
+  </body>
+</html>

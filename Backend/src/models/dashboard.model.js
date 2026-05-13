@@ -1,72 +1,54 @@
 import pool from "../config/db.js";
 
-// 🔹 GET DASHBOARD STATS
-export const getStats = async () => {
-  // Total students
-  const [studentsResult] = await pool.query("SELECT COUNT(*) as total FROM students WHERE status = 'active'");
-  const totalStudents = studentsResult[0].total;
+export const getDashboard = async (limit = 5) => {
+  const [[studentsRow]] = await pool.query("SELECT COUNT(*) AS total_students FROM students");
+  const [[guardiansRow]] = await pool.query("SELECT COUNT(*) AS total_guardians FROM guardians");
+  const [[paymentsRow]] = await pool.query("SELECT COUNT(*) AS total_payments FROM payments");
+  const [[pendingRow]] = await pool.query("SELECT COUNT(*) AS pending_accounts FROM accounts_receivable WHERE status = 'pending'");
 
-  // Total guardians
-  const [guardiansResult] = await pool.query("SELECT COUNT(*) as total FROM guardians");
-  const totalGuardians = guardiansResult[0].total;
+  const [recentStudentsRows] = await pool.query(
+    `SELECT id, first_name, last_name, created_at FROM students ORDER BY created_at DESC LIMIT ?`,
+    [limit]
+  );
 
-  // Total pending accounts
-  const [pendingAccountsResult] = await pool.query("SELECT COUNT(*) as total FROM accounts_receivable WHERE status = 'pending'");
-  const totalPendingAccounts = pendingAccountsResult[0].total;
-
-  // Total outstanding balance
-  const [outstandingResult] = await pool.query("SELECT SUM(outstanding_balance) as total FROM accounts_receivable WHERE status != 'paid'");
-  const totalOutstanding = outstandingResult[0].total || 0;
-
-  // Recent payments (last 30 days)
-  const [recentPaymentsResult] = await pool.query(`
-    SELECT COUNT(*) as total, SUM(amount_paid) as amount
-    FROM payments
-    WHERE payment_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-  `);
-  const recentPayments = {
-    count: recentPaymentsResult[0].total,
-    amount: recentPaymentsResult[0].amount || 0
-  };
+  const [recentPaymentsRows] = await pool.query(
+    `SELECT id, amount_paid, payment_method, payment_date FROM payments ORDER BY payment_date DESC LIMIT ?`,
+    [limit]
+  );
 
   return {
-    totalStudents,
-    totalGuardians,
-    totalPendingAccounts,
-    totalOutstanding,
-    recentPayments
+    total_students: studentsRow.total_students || 0,
+    total_guardians: guardiansRow.total_guardians || 0,
+    total_payments: paymentsRow.total_payments || 0,
+    pending_accounts: pendingRow.pending_accounts || 0,
+    recent_students: recentStudentsRows,
+    recent_payments: recentPaymentsRows,
   };
 };
 
-// 🔹 GET RECENT ACTIVITY
+export const getStats = async () => {
+  const dashboard = await getDashboard(5);
+  return {
+    totalStudents: dashboard.total_students,
+    totalGuardians: dashboard.total_guardians,
+    totalPayments: dashboard.total_payments,
+    pendingAccounts: dashboard.pending_accounts,
+  };
+};
+
 export const getRecentActivity = async (limit = 10) => {
-  const [rows] = await pool.query(`
-    SELECT
-      'payment' as type,
-      p.id,
-      p.payment_date as date,
-      CONCAT('Payment of $', p.amount_paid, ' for ', s.first_name, ' ', s.last_name) as description,
-      p.amount_paid as amount
-    FROM payments p
-    JOIN accounts_receivable ar ON p.account_receivable_id = ar.id
-    JOIN students s ON ar.student_id = s.id
-    ORDER BY p.payment_date DESC
-    LIMIT ?
+  const [recentStudentsRows] = await pool.query(
+    `SELECT id, first_name, last_name, created_at FROM students ORDER BY created_at DESC LIMIT ?`,
+    [limit]
+  );
 
-    UNION ALL
+  const [recentPaymentsRows] = await pool.query(
+    `SELECT id, amount_paid, payment_method, payment_date FROM payments ORDER BY payment_date DESC LIMIT ?`,
+    [limit]
+  );
 
-    SELECT
-      'account' as type,
-      ar.id,
-      ar.created_at as date,
-      CONCAT('New charge for ', s.first_name, ' ', s.last_name, ' - ', ct.name) as description,
-      ar.amount as amount
-    FROM accounts_receivable ar
-    JOIN students s ON ar.student_id = s.id
-    JOIN charge_types ct ON ar.charge_type_id = ct.id
-    ORDER BY ar.created_at DESC
-    LIMIT ?
-  `, [limit, limit]);
-
-  return rows;
+  return {
+    recent_students: recentStudentsRows,
+    recent_payments: recentPaymentsRows,
+  };
 };

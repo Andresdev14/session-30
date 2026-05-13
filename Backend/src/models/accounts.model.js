@@ -12,6 +12,19 @@ export const getAll = async () => {
   return rows;
 };
 
+// 🔹 GET PENDING ACCOUNTS (outstanding_balance > 0)
+export const getPending = async () => {
+  const [rows] = await pool.query(`
+    SELECT ar.*, s.first_name, s.last_name, ct.name as charge_type_name
+    FROM accounts_receivable ar
+    JOIN students s ON ar.student_id = s.id
+    JOIN charge_types ct ON ar.charge_type_id = ct.id
+    WHERE ar.outstanding_balance > 0
+    ORDER BY ar.due_date ASC
+  `);
+  return rows;
+};
+
 // 🔹 GET BY ID
 export const getById = async (id) => {
   const [rows] = await pool.query(`

@@ -1,4 +1,5 @@
 import * as studentModel from "../models/student.model.js";
+import * as studentGuardianModel from "../models/studentGuardian.model.js";
 
 // GET
 export const getStudents = async (req, res) => {
@@ -39,6 +40,9 @@ export const createStudent = async (req, res) => {
     }
 
     const result = await studentModel.create(req.body);
+    if (Array.isArray(req.body.guardian_ids)) {
+      await studentGuardianModel.replaceRelationsForStudent(result.id, req.body.guardian_ids);
+    }
     res.status(201).json({ ok: true, data: result });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
@@ -53,6 +57,10 @@ export const updateStudent = async (req, res) => {
 
     if (!updated) {
       return res.status(404).json({ ok: false, error: "Student not found" });
+    }
+
+    if (Array.isArray(req.body.guardian_ids)) {
+      await studentGuardianModel.replaceRelationsForStudent(id, req.body.guardian_ids);
     }
 
     res.json({ ok: true, data: updated });
@@ -73,6 +81,10 @@ export const deleteStudent = async (req, res) => {
 
     res.json({ ok: true, message: "Student deleted successfully" });
   } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
+    console.error("Failed to delete student:", error);
+    const message = error.message.includes("Cannot delete")
+      ? "No se puede eliminar este estudiante porque tiene registros relacionados. Elimina primero asistencia, cuentas o notificaciones asociadas."
+      : error.message;
+    res.status(500).json({ ok: false, error: message });
   }
 };

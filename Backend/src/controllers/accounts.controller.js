@@ -10,6 +10,16 @@ export const getAccounts = async (req, res) => {
   }
 };
 
+// 🔹 GET PENDING ACCOUNTS
+export const getPendingAccounts = async (req, res) => {
+  try {
+    const data = await accountsModel.getPending();
+    res.json({ ok: true, data });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+};
+
 // 🔹 GET ACCOUNT BY ID
 export const getAccountById = async (req, res) => {
   try {

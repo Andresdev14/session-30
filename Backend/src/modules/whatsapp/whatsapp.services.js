@@ -14,12 +14,12 @@
 export const sendWhatsAppMessage = async (phone, message) => {
   try {
     // Get configuration from environment variables
-    const token = process.env.WHATSAPP_TOKEN;
+    const token = process.env.WHATSAPP_TOKEN || process.env.ACCESS_TOKEN;
     const phoneNumberId = process.env.PHONE_ID;
 
     // Validate that required environment variables are set
     if (!token) {
-      throw new Error("WHATSAPP_TOKEN environment variable is not set");
+      throw new Error("WhatsApp access token environment variable is not set");
     }
 
     if (!phoneNumberId) {

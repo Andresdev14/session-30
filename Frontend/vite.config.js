@@ -12,6 +12,8 @@ export default defineConfig({
         students: resolve(__dirname, "src/pages/students/students.html"),
         guardians: resolve(__dirname, "src/pages/guardians/guardians.html"),
         payments: resolve(__dirname, "src/pages/payments/payments.html"),
+        attendance: resolve(__dirname, "src/pages/attendance/index.html"),
+        whatsapp: resolve(__dirname, "src/pages/whatsapp/whatsapp.html"),
       },
     },
   },

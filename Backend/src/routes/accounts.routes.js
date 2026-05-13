@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAccounts,
+  getPendingAccounts,
   getAccountById,
   getAccountsByStudent,
   createAccount,
@@ -11,6 +12,7 @@ import {
 const router = express.Router();
 
 router.get("/", getAccounts);
+router.get("/pending", getPendingAccounts);
 router.get("/:id", getAccountById);
 router.get("/student/:studentId", getAccountsByStudent);
 router.post("/", createAccount);

@@ -1,0 +1,66 @@
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  padding: 32px;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e7efff;
+}
+
+.placeholder-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 28px;
+  margin-top: 24px;
+}
+
+.placeholder-card h2 {
+  margin-bottom: 16px;
+}
+
+.placeholder-message {
+  margin-top: 20px;
+  padding: 18px;
+  background: rgba(93, 140, 255, 0.08);
+  border: 1px solid rgba(93, 140, 255, 0.2);
+  border-radius: 14px;
+  color: #eef2ff;
+  font-size: 1rem;
+}

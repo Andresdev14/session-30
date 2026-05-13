@@ -4,56 +4,106 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | School Admin</title>
-    <link rel="stylesheet" href="/src/shared/css/dashboard.css" />
+    <link rel="stylesheet" href="/src/pages/dashboard/dashboard.css" />
   </head>
   <body>
-    <main class="dashboard-page">
+    <main class="dashboard-shell">
       <header class="page-header">
         <div>
           <p class="eyebrow">Panel escolar</p>
-          <h1>Resumen</h1>
-          <p class="subtitle">Total de estudiantes, acudientes, pagos y cuentas pendientes.</p>
+          <h1>Panel de control</h1>
+          <p class="subtitle">Monitorea estudiantes, pagos y cuentas pendientes al instante.</p>
         </div>
+
         <div class="page-actions">
           <a class="button secondary-button" href="../students/students.html">Estudiantes</a>
           <a class="button secondary-button" href="../guardians/guardians.html">Acudientes</a>
           <a class="button secondary-button" href="../payments/payments.html">Pagos</a>
+          <a class="button secondary-button" href="../whatsapp/whatsapp.html">WhatsApp</a>
           <button id="logoutBtn" class="button danger-button">Cerrar sesión</button>
         </div>
       </header>
 
-      <section class="metric-grid">
-        <article class="metric-card">
-          <span class="metric-value" id="studentsCount">0</span>
-          <p class="metric-label">Estudiantes</p>
+      <section class="status-grid" aria-label="Indicadores principales">
+        <article class="status-card">
+          <p class="status-label">Estudiantes</p>
+          <strong class="status-value" id="studentsCount">0</strong>
+          <p class="status-caption">Total escolar registrado</p>
         </article>
 
-        <article class="metric-card">
-          <span class="metric-value" id="guardiansCount">0</span>
-          <p class="metric-label">Acudientes</p>
+        <article class="status-card">
+          <p class="status-label">Acudientes</p>
+          <strong class="status-value" id="guardiansCount">0</strong>
+          <p class="status-caption">Encargados vinculados</p>
         </article>
 
-        <article class="metric-card">
-          <span class="metric-value" id="paymentsCount">0</span>
-          <p class="metric-label">Pagos Registrados</p>
+        <article class="status-card">
+          <p class="status-label">Pagos</p>
+          <strong class="status-value" id="paymentsCount">0</strong>
+          <p class="status-caption">Transacciones registradas</p>
         </article>
 
-        <article class="metric-card">
-          <span class="metric-value" id="pendingCount">0</span>
-          <p class="metric-label">Cuentas Pendientes</p>
+        <article class="status-card">
+          <p class="status-label">Cuentas pendientes</p>
+          <strong class="status-value" id="pendingCount">0</strong>
+          <p class="status-caption">Cobros aún abiertos</p>
         </article>
       </section>
 
-      <section class="info-card">
-        <h2>Accesos rápidos</h2>
-        <div class="quick-actions">
-          <a href="../students/students.html" class="button primary-button">Ver estudiantes</a>
-          <a href="../guardians/guardians.html" class="button primary-button">Ver acudientes</a>
-          <a href="../payments/payments.html" class="button primary-button">Registrar pago</a>
-        </div>
+      <section class="activity-grid">
+        <article class="activity-card">
+          <header class="card-header">
+            <div>
+              <h2>Últimos estudiantes</h2>
+              <p>Las incorporaciones más recientes al sistema.</p>
+            </div>
+            <span class="badge info">Reciente</span>
+          </header>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody id="recentStudentsBody">
+                <tr><td colspan="2" class="empty-state">Cargando estudiantes...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="activity-card">
+          <header class="card-header">
+            <div>
+              <h2>Últimos pagos</h2>
+              <p>Movimientos de pago recientes registrados en el sistema.</p>
+            </div>
+            <span class="badge success">Finanzas</span>
+          </header>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Monto</th>
+                  <th>Método</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="recentPaymentsBody">
+                <tr><td colspan="3" class="empty-state">Cargando pagos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
       </section>
+
+      <div id="dashboardMessage" class="dashboard-message" hidden></div>
     </main>
 
-    <script type="module" src="/src/shared/js/dashboard.js"></script>
+    <script type="module" src="/src/pages/dashboard/dashboard.js"></script>
   </body>
 </html>

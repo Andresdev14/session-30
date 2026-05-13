@@ -30,6 +30,7 @@ loginForm.addEventListener("submit", async (event) => {
     const data = await response.json();
 
     if (data.ok && data.token) {
+      localStorage.setItem("token", data.token);
       localStorage.setItem("school_token", data.token);
       window.location.href = "../dashboard/dashboard.html";
       return;

@@ -1,9 +1,35 @@
+import { randomUUID } from "crypto";
 import pool from "../config/db.js";
+
+const attachGuardians = async (students) => {
+  if (!students || students.length === 0) return students;
+  const studentIds = students.map((student) => student.id);
+  const placeholders = studentIds.map(() => "?").join(",");
+  const [relations] = await pool.query(
+    `SELECT sg.student_id, g.id AS guardian_id, g.first_name, g.last_name, g.phone,
+            sg.relationship, sg.is_primary, sg.is_payment_responsible, sg.receives_notifications
+     FROM student_guardians sg
+     JOIN guardians g ON sg.guardian_id = g.id
+     WHERE sg.student_id IN (${placeholders})`,
+    studentIds
+  );
+
+  const relationMap = {};
+  relations.forEach((relation) => {
+    relationMap[relation.student_id] = relationMap[relation.student_id] || [];
+    relationMap[relation.student_id].push(relation);
+  });
+
+  return students.map((student) => ({
+    ...student,
+    guardians: relationMap[student.id] || []
+  }));
+};
 
 // 🔹 GET ALL
 export const getAll = async () => {
   const [rows] = await pool.query("SELECT * FROM students");
-  return rows;
+  return attachGuardians(rows);
 };
 
 // 🔹 GET BY ID
@@ -12,7 +38,22 @@ export const getById = async (id) => {
     "SELECT * FROM students WHERE id = ?",
     [id]
   );
-  return rows[0];
+  const student = rows[0];
+  if (!student) return null;
+
+  const [relations] = await pool.query(
+    `SELECT sg.student_id, g.id AS guardian_id, g.first_name, g.last_name, g.phone,
+            sg.relationship, sg.is_primary, sg.is_payment_responsible, sg.receives_notifications
+     FROM student_guardians sg
+     JOIN guardians g ON sg.guardian_id = g.id
+     WHERE sg.student_id = ?`,
+    [id]
+  );
+
+  return {
+    ...student,
+    guardians: relations
+  };
 };
 
 // 🔹 CREATE
@@ -29,11 +70,13 @@ export const create = async (data) => {
     status
   } = data;
 
-  const [result] = await pool.query(
+  const id = randomUUID();
+  await pool.query(
     `INSERT INTO students
     (id, student_code, first_name, last_name, document_type, document_number, birth_date, grade, school_year, status)
-    VALUES (UUID(), ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
+      id,
       student_code,
       first_name,
       last_name,
@@ -46,7 +89,18 @@ export const create = async (data) => {
     ]
   );
 
-  return result;
+  return {
+    id,
+    student_code,
+    first_name,
+    last_name,
+    document_type: document_type || null,
+    document_number: document_number || null,
+    birth_date: birth_date || null,
+    grade: grade || null,
+    school_year: school_year || null,
+    status: status || "active"
+  };
 };
 
 // 🔹 UPDATE
@@ -94,6 +148,39 @@ export const update = async (id, data) => {
 
 // 🔹 DELETE
 export const remove = async (id) => {
-  const [result] = await pool.query("DELETE FROM students WHERE id = ?", [id]);
-  return result.affectedRows > 0;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    await connection.query("DELETE FROM whatsapp_notifications WHERE student_id = ?", [id]);
+    await connection.query("DELETE FROM attendance WHERE student_id = ?", [id]);
+    await connection.query("DELETE FROM student_guardians WHERE student_id = ?", [id]);
+
+    const [accountRows] = await connection.query(
+      "SELECT id FROM accounts_receivable WHERE student_id = ?",
+      [id]
+    );
+
+    if (accountRows.length > 0) {
+      const accountIds = accountRows.map((row) => row.id);
+      const placeholders = accountIds.map(() => "?").join(",");
+      await connection.query(
+        `DELETE FROM payments WHERE account_receivable_id IN (${placeholders})`,
+        accountIds
+      );
+      await connection.query(
+        `DELETE FROM accounts_receivable WHERE student_id = ?`,
+        [id]
+      );
+    }
+
+    const [result] = await connection.query("DELETE FROM students WHERE id = ?", [id]);
+    await connection.commit();
+    return result.affectedRows > 0;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };

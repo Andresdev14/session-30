@@ -4,27 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Acudientes | School Admin</title>
-    <link rel="stylesheet" href="/src/shared/css/table.css" />
-    <link rel="stylesheet" href="/src/shared/css/form.css" />
+    <link rel="stylesheet" href="/src/pages/guardians/guardians.css" />
   </head>
   <body>
-    <main class="page-shell">
+    <main class="page-shell guardians-shell">
       <header class="page-header">
         <div>
           <p class="eyebrow">Acudientes</p>
-          <h1>Listado y registro</h1>
-          <p class="subtitle">Administra los datos de los acudientes registrados.</p>
+          <h1>Gestión de encargados</h1>
+          <p class="subtitle">Crea, edita y elimina acudientes con autenticación segura.</p>
         </div>
         <div class="page-actions">
           <a class="button secondary-button" href="../dashboard/dashboard.html">Dashboard</a>
           <a class="button secondary-button" href="../students/students.html">Estudiantes</a>
           <a class="button secondary-button" href="../payments/payments.html">Pagos</a>
+          <a class="button secondary-button" href="../whatsapp/whatsapp.html">WhatsApp</a>
         </div>
       </header>
+      <div id="toastContainer" class="toast-container"></div>
 
       <section class="table-card">
-        <h2>Lista de acudientes</h2>
-        <div class="table-wrapper">
+        <div class="section-head">
+          <div>
+            <h2>Lista de acudientes</h2>
+            <p class="section-copy">Visualiza todos los acudientes registrados y administra la información al instante.</p>
+          </div>
+          <span id="guardiansStatus" class="status-pill">Cargando...</span>
+        </div>
+
+        <div class="table-actions">
+          <input id="guardianSearch" class="search-input" type="search" placeholder="Buscar por nombre, teléfono o correo" />
+        </div>
+
+        <div class="table-wrapper responsive-table">
           <table>
             <thead>
               <tr>
@@ -33,6 +45,8 @@
                 <th>Teléfono</th>
                 <th>Correo</th>
                 <th>Dirección</th>
+                <th>WhatsApp</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody id="guardiansBody"></tbody>
@@ -41,36 +55,66 @@
       </section>
 
       <section class="form-card">
-        <h2>Registrar acudiente</h2>
-        <div id="guardianMessage" class="message" hidden></div>
+        <div class="section-head">
+          <div>
+            <h2 id="formTitle">Registrar acudiente</h2>
+            <p class="section-copy">Llena los datos para crear un acudiente o actualiza uno existente.</p>
+          </div>
+          <span id="formModeBadge" class="badge info">Modo creación</span>
+        </div>
+
+        <div id="guardianMessage" class="message success" hidden></div>
+
         <form id="guardianForm" class="form-grid">
           <label class="form-label">
             Nombre
-            <input id="guardianFirstName" type="text" required />
+            <input id="guardianFirstName" type="text" required autocomplete="off" />
           </label>
           <label class="form-label">
             Apellido
-            <input id="guardianLastName" type="text" required />
+            <input id="guardianLastName" type="text" required autocomplete="off" />
           </label>
           <label class="form-label">
             Teléfono
-            <input id="guardianPhone" type="text" required />
+            <input id="guardianPhone" type="text" required autocomplete="off" />
           </label>
           <label class="form-label">
             Correo
-            <input id="guardianEmail" type="email" />
+            <input id="guardianEmail" type="email" autocomplete="off" />
           </label>
           <label class="form-label">
             Dirección
-            <input id="guardianAddress" type="text" />
+            <input id="guardianAddress" type="text" autocomplete="off" />
           </label>
-          <div class="form-actions">
-            <button type="submit" class="button primary-button">Guardar acudiente</button>
+          <label class="form-label">
+            Estudiantes
+            <select id="guardianStudents" multiple size="4"></select>
+            <span class="form-hint">Mantén presionada la tecla Ctrl o Cmd para seleccionar varios estudiantes.</span>
+          </label>
+          <label class="form-label">
+            WhatsApp activo
+            <select id="guardianWhatsappActive">
+              <option value="0">No</option>
+              <option value="1">Sí</option>
+            </select>
+          </label>
+          <div class="form-actions full-width">
+            <button type="submit" class="button primary-button" id="submitButton">Guardar acudiente</button>
+            <button type="button" class="button secondary-button" id="cancelEditBtn" hidden>Cancelar</button>
           </div>
         </form>
       </section>
+      <div id="confirmModal" class="modal-overlay hidden">
+        <div class="modal-card">
+          <p id="confirmModalMessage">¿Estás seguro de esta acción?</p>
+          <div class="modal-actions">
+            <button id="confirmCancelBtn" class="button secondary-button">Cancelar</button>
+            <button id="confirmDeleteBtn" class="button danger-button">Eliminar</button>
+          </div>
+        </div>
+      </div>
     </main>
 
-    <script type="module" src="/src/shared/js/guardians.js"></script>
+    <script type="module" src="/src/pages/guardians/guardians.js"></script>
   </body>
 </html>

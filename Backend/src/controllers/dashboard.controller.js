@@ -1,37 +1,27 @@
 import * as dashboardModel from "../models/dashboard.model.js";
 
-// 🔹 GET DASHBOARD STATS
 export const getDashboardStats = async (req, res) => {
   try {
-    const data = await dashboardModel.getStats();
+    const stats = await dashboardModel.getStats();
+    res.json({ ok: true, data: stats });
+  } catch (error) {
+    res.status(500).json({ ok: false, error: error.message });
+  }
+};
+
+export const getDashboard = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 5;
+    const data = await dashboardModel.getDashboard(limit);
     res.json({ ok: true, data });
   } catch (error) {
     res.status(500).json({ ok: false, error: error.message });
   }
 };
 
-// 🔹 GET DASHBOARD (combined endpoint)
-export const getDashboard = async (req, res) => {
-  try {
-    const stats = await dashboardModel.getStats();
-    const activity = await dashboardModel.getRecentActivity(5);
-
-    res.json({
-      ok: true,
-      data: {
-        stats,
-        recentActivity: activity
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
-  }
-};
-
-// 🔹 GET RECENT ACTIVITY
 export const getRecentActivity = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit, 10) || 10;
     const data = await dashboardModel.getRecentActivity(limit);
     res.json({ ok: true, data });
   } catch (error) {

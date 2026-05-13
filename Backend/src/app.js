@@ -7,7 +7,7 @@ import studentRoutes from "./routes/student.routes.js";
 import studentGuardianRoutes from "./routes/studentGuardian.routes.js";
 import chargeTypesRoutes from "./routes/charge-types.routes.js";
 import accountsRoutes from "./routes/accounts.routes.js";
-import pagosRoutes from "./routes/pagos.routes.js";
+import paymentsRoutes from "./routes/payments.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import usuariosRoutes from "./routes/usuarios.routes.js";
 import authMiddleware from "./middlewares/auth.middleware.js";
@@ -26,9 +26,9 @@ app.use("/student.guardians", authMiddleware, studentGuardianRoutes);
 app.use("/student-guardians", authMiddleware, studentGuardianRoutes);
 app.use("/charge-types", authMiddleware, chargeTypesRoutes);
 app.use("/accounts", authMiddleware, accountsRoutes);
-app.use("/pagos", authMiddleware, pagosRoutes);
+app.use("/payments", authMiddleware, paymentsRoutes);
 app.use("/dashboard", authMiddleware, dashboardRoutes);
-app.use("/whatsapp", whatsappRoutes);
+app.use("/whatsapp", authMiddleware, whatsappRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });

@@ -42,6 +42,22 @@ export const getByAccount = async (accountId) => {
 export const create = async (data) => {
   const { account_receivable_id, recorded_by_user_id, payment_date, amount_paid, payment_method, reference } = data;
 
+  // Check current outstanding balance
+  const [accountRows] = await pool.query(
+    "SELECT outstanding_balance FROM accounts_receivable WHERE id = ?",
+    [account_receivable_id]
+  );
+
+  if (accountRows.length === 0) {
+    throw new Error("Account receivable not found");
+  }
+
+  const currentBalance = parseFloat(accountRows[0].outstanding_balance);
+
+  if (amount_paid > currentBalance) {
+    throw new Error("Payment amount exceeds outstanding balance");
+  }
+
   const [result] = await pool.query(
     `INSERT INTO payments
     (id, account_receivable_id, recorded_by_user_id, payment_date, amount_paid, payment_method, reference)
@@ -49,34 +65,59 @@ export const create = async (data) => {
     [account_receivable_id, recorded_by_user_id || null, payment_date, amount_paid, payment_method, reference || null]
   );
 
-  // Update outstanding balance in accounts_receivable
+  // Update outstanding balance
+  const newBalance = currentBalance - amount_paid;
   await pool.query(
-    "UPDATE accounts_receivable SET outstanding_balance = outstanding_balance - ? WHERE id = ?",
-    [amount_paid, account_receivable_id]
+    "UPDATE accounts_receivable SET outstanding_balance = ? WHERE id = ?",
+    [newBalance, account_receivable_id]
   );
+
+  // If balance is zero or less, mark as paid
+  if (newBalance <= 0) {
+    await pool.query(
+      "UPDATE accounts_receivable SET status = 'paid' WHERE id = ?",
+      [account_receivable_id]
+    );
+  }
 
   return result;
 };
 
-// 🔹 UPDATE PAYMENT
-export const update = async (id, data) => {
-  const { payment_date, amount_paid, payment_method, reference } = data;
-
-  const [result] = await pool.query(
-    `UPDATE payments SET
-      payment_date = COALESCE(?, payment_date),
-      amount_paid = COALESCE(?, amount_paid),
-      payment_method = COALESCE(?, payment_method),
-      reference = COALESCE(?, reference)
-    WHERE id = ?`,
-    [payment_date || null, amount_paid || null, payment_method || null, reference || null, id]
-  );
-
-  return result.affectedRows ? { id, ...data } : null;
-};
-
 // 🔹 DELETE PAYMENT
 export const remove = async (id) => {
-  const [result] = await pool.query("DELETE FROM payments WHERE id = ?", [id]);
-  return result.affectedRows > 0;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [paymentRows] = await connection.query(
+      "SELECT account_receivable_id, amount_paid FROM payments WHERE id = ?",
+      [id]
+    );
+
+    if (paymentRows.length === 0) {
+      await connection.commit();
+      return false;
+    }
+
+    const { account_receivable_id, amount_paid } = paymentRows[0];
+    await connection.query("DELETE FROM payments WHERE id = ?", [id]);
+
+    await connection.query(
+      "UPDATE accounts_receivable SET outstanding_balance = outstanding_balance + ? WHERE id = ?",
+      [amount_paid, account_receivable_id]
+    );
+
+    await connection.query(
+      "UPDATE accounts_receivable SET status = 'pending' WHERE id = ? AND outstanding_balance > 0",
+      [account_receivable_id]
+    );
+
+    await connection.commit();
+    return true;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
